@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vuetify": "^3.3.20"
   },
   "description": "A Vue 3 + Vite project for building Chrome extensions",
   "devDependencies": {

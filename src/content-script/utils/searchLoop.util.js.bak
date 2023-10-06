@@ -1,0 +1,158 @@
+import clickEvent from "./click.util";
+import arrive from "arrive";
+var event = new UIEvent("change", {
+  view: window,
+  bubbles: true,
+  cancelable: true,
+});
+
+function countResults() {
+  return new Promise(function (resolve, reject) {
+    document.arrive(".SearchResults", function (newElem) {
+      let length = 0;
+
+      setTimeout(() => {
+        if (document.querySelector(".listFUTItem")) {
+          length = document.querySelectorAll(
+            ".paginated-item-list > ul > li"
+          ).length;
+        }
+
+        resolve(length);
+      }, 1000);
+    });
+  });
+}
+
+function setFilter(maxBuy) {
+  clickEvent(
+    document
+      .querySelectorAll(".price-filter")[2]
+      .getElementsByTagName("button")[1]
+  );
+
+  if (
+    document
+      .querySelectorAll(".price-filter")[2]
+      .getElementsByTagName("input")[0].value == maxBuy
+  ) {
+    document
+      .querySelectorAll(".price-filter")[2]
+      .getElementsByTagName("input")[0].value = 0;
+    document
+      .querySelectorAll(".price-filter")[2]
+      .getElementsByTagName("input")[0]
+      .dispatchEvent(event);
+  } else {
+    clickEvent(
+      document
+        .querySelectorAll(".price-filter")[2]
+        .getElementsByTagName("button")[1]
+    );
+  }
+
+  document
+    .querySelectorAll(".price-filter")[3]
+    .getElementsByTagName("input")[0].value = maxBuy;
+
+  document
+    .querySelectorAll(".price-filter")[3]
+    .getElementsByTagName("input")[0]
+    .dispatchEvent(event);
+}
+
+export default function searchLoop(maxBuy, sellPrice, searching) {
+  document.unbindArrive(".ut-quick-list-panel-view");
+  document.unbindArrive(".ea-dialog-view--body");
+  document.unbindArrive(".SearchResults");
+  if (!searching) {
+    return false;
+  }
+
+  return new Promise(function (resolve, reject) {
+    setFilter(maxBuy, sellPrice, searching);
+
+    clickEvent(
+      ".ut-market-search-filters-view .btn-standard.call-to-action"
+    ).then((response) => {
+      countResults()
+        .then((response) => {
+          switch (response) {
+            case 0:
+              if (!searching) {
+                return false;
+              }
+              setTimeout(function () {
+                clickEvent(".ut-navigation-button-control");
+              }, 1000);
+
+              setTimeout(function () {
+                resolve();
+              }, 1000);
+              break;
+            case response > 10:
+              if (!searching) {
+                return false;
+              }
+              reject();
+              break;
+            default:
+              if (!searching) {
+                return false;
+              }
+              clickEvent(".buyButton");
+
+              document.arrive(".ea-dialog-view--body", function (newElem) {
+                clickEvent(
+                  document.querySelector(
+                    ".ea-dialog-view--body .ut-button-group button"
+                  )
+                );
+
+                setTimeout(() => {
+                  if (document.querySelector(".Notification.negative")) {
+                    setTimeout(function () {
+                      clickEvent(".ut-navigation-button-control");
+                    }, 500);
+                    setTimeout(function () {
+                      resolve();
+                    }, 500);
+                  } else {
+                    document.arrive(
+                      ".ut-quick-list-panel-view",
+                      function (newElem) {
+                        clickEvent(".accordian");
+
+                        let buyNowEl = document
+                          .querySelectorAll(".panelActionRow")[2]
+                          .querySelector("input");
+                        let bidEl = document
+                          .querySelectorAll(".panelActionRow")[1]
+                          .querySelector("input");
+
+                        bidEl.value = sellPrice;
+                        buyNowEl.value = sellPrice;
+                        buyNowEl.dispatchEvent(event);
+
+                        clickEvent(
+                          document
+                            .querySelector(".panelActions")
+                            .querySelectorAll("button")[4]
+                        );
+                        setTimeout(function () {
+                          clickEvent(".ut-navigation-button-control");
+                        }, 1000);
+                        setTimeout(function () {
+                          resolve();
+                        }, 1000);
+                      }
+                    );
+                  }
+                }, 1000);
+              });
+          }
+        })
+        .finally(() => {});
+    });
+  });
+}

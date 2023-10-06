@@ -1,0 +1,72 @@
+body {
+    color: #fcfcf7 !important;
+    background-image: url(https://www.ea.com/nl-nl/ea-sports-fc/ultimate-team/web-app/images/backgrounds/BG_Tablet-Web-1080p.jpg);
+    background-size: cover;
+  }
+
+  .v-field {
+    border-radius: 0 !important;
+    border: 1px solid #a6a6a1;
+  }
+
+  .v-field__input {
+    background-color: var(--primary);
+  }
+
+  .v-label.v-field-label {
+    color: #fcfcf7 !important;
+  }
+
+  [type=text]:focus, input:where(:not([type])):focus, [type=email]:focus, [type=url]:focus, [type=password]:focus, [type=number]:focus, [type=date]:focus, [type=datetime-local]:focus, [type=month]:focus, [type=search]:focus, [type=tel]:focus, [type=time]:focus, [type=week]:focus, [multiple]:focus, textarea:focus, select:focus {
+    box-shadow: none;
+    border-color: none;
+  }
+
+  
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .btn-primary {
+    background-color: #fcfcf7 !important;
+
+    .v-btn__content {
+        color: #151616 !important;
+    }
+  }
+
+  .btn-active {
+    background-color: #07f468 !important;
+
+    .v-btn__content {
+        color: #151616 !important;
+    }
+  }
+
+  .v-card-text {
+    background-image: url(https://www.ea.com/nl-nl/ea-sports-fc/ultimate-team/web-app/images/branding/fut24_gfx_default.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #222426;
+  }
+
+  .v-input__prepend {
+    margin-right: 0 !important;
+
+    button {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        height: 100% !important;
+    }
+  }
+  
+  .v-input__append {
+    margin-left: 0 !important;
+
+    button {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        height: 100% !important;
+    }
+  }
