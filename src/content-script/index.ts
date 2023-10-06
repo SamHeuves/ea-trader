@@ -1,4 +1,13 @@
 import './index.scss'
+// import { sendMessage } from "webext-bridge/content-script";
+
+chrome.runtime.sendMessage(
+  "message",
+  function (response) {
+      console.log(response);
+  }
+);
+
 
 const src = chrome.runtime.getURL('src/content-script/iframe/index.html')
 
