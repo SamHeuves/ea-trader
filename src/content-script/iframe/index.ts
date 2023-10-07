@@ -16,7 +16,7 @@ const myCustomLightTheme = {
   colors: {
     background: '#000',
     surface: '#FFFFFF',
-    primary: '#151616',
+    primary: '#0f0f0f',
     'primary-darken-1': '#3700B3',
     secondary: '#787873',
     'secondary-darken-1': '#018786',

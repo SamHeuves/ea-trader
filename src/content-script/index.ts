@@ -1,5 +1,7 @@
 import './index.scss'
 import searchLoop from './iframe/actions/searchLoop.action'
+import insertionQ from 'insertion-query'
+import click from './iframe/actions/click.action'
 
 const iFrame = document.createElement('iframe')
 
@@ -34,9 +36,12 @@ style.innerHTML = `#NotificationLayer {z-index: 99999999999999;} .app-active {
 
 document.getElementsByTagName('head')[0].appendChild(style)
 
+insertionQ('.ut-root-view').every(function(element: HTMLElement){
+	element.classList.add('app-active')
+});
+
 let searching: boolean
 
-// content-script/index.ts
 window.addEventListener('message', async (event) => {
   const { data } = event
   searching = data.searching
@@ -57,10 +62,13 @@ window.addEventListener('message', async (event) => {
       })
   }
 
-  if (data.action == 'goToTransfer') {
-    startSearch(searching)
+  // Go to transferlist page
+  if (data.action == 'goToTransferList') {
+    click('button.icon-transfer');
+    click('.ut-tile-transfer-market');
   }
 
+  // Start or stop searching
   if (data.action == 'startSearch') {
     startSearch(searching)
   }

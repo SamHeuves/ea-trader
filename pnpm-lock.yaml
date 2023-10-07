@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  insertion-query:
+    specifier: ^1.1.0
+    version: 1.1.0
   vue:
     specifier: ^3.3.4
     version: 3.3.4
@@ -1829,6 +1832,10 @@ packages:
   /inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: true
+
+  /insertion-query@1.1.0:
+    resolution: {integrity: sha512-5HZCK1xmD+Cm5q9/Qk1S8tr2BqHtcvseGsg7LKD3WlHRg4OOCl7d6C5raGNXAhfV4NlUcHmAtdJt0b3vJPEuiA==}
+    dev: false
 
   /internal-slot@1.0.5:
     resolution: {integrity: sha512-Y+R5hJrzs52QCG2laLn4udYVnxsfny9CpOhNhUvk/SSSVyF6T27FzRbF0sroPidSu3X8oEAkOn2K804mjpt6UQ==}

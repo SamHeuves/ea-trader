@@ -2,16 +2,16 @@
 
 <template>
   <header aria-label="Site Header">
-    <div class="navbar bg-primary">
-      <span class="normal-case text-xl">EAFC Trader</span>
-    </div>
+    <v-toolbar
+      color="primary"
+      density="compact"
+      title="EAFC Trader"
+    ></v-toolbar>
   </header>
 
   <RouterView></RouterView>
 
-  <footer aria-label="Site Footer">
-    Content Script Iframe Footer
-  </footer>
+  <footer aria-label="Site Footer">Content Script Iframe Footer</footer>
 </template>
 
 <style scoped></style>
