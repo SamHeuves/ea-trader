@@ -11,7 +11,12 @@
 
   <RouterView></RouterView>
 
-  <footer aria-label="Site Footer">Content Script Iframe Footer</footer>
+  <v-footer
+    color="primary"
+    density="compact"
+  >
+    <strong>Active session</strong>
+  </v-footer>
 </template>
 
 <style scoped></style>

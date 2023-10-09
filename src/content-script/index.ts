@@ -4,6 +4,9 @@ import insertionQ from 'insertion-query'
 import click from './iframe/actions/click.action'
 
 const iFrame = document.createElement('iframe')
+let transferSearch: boolean
+let searching: boolean
+let loading: boolean
 
 /**
  * The code below will get everything going. Initialize the iFrame with defaults and add it to the page.
@@ -36,11 +39,25 @@ style.innerHTML = `#NotificationLayer {z-index: 99999999999999;} .app-active {
 
 document.getElementsByTagName('head')[0].appendChild(style)
 
+// Add class for UT, to fit next to extension
 insertionQ('.ut-root-view').every(function(element: HTMLElement){
 	element.classList.add('app-active')
 });
 
-let searching: boolean
+// When page is loaded
+insertionQ('.ut-navigation-container-view--content > div').every(function(element: HTMLElement){
+  if (element.classList.contains('ut-market-search-filters-view')) {
+    transferSearch = true;
+  } else {
+    transferSearch = false;
+  }
+  
+  loading = false
+  
+  if (iFrame.contentWindow) {
+    iFrame.contentWindow.postMessage({action: 'pageChange', transferSearch, loading}, "*");
+  }
+});
 
 window.addEventListener('message', async (event) => {
   const { data } = event
