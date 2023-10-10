@@ -1,9 +1,11 @@
 <script setup lang="ts"></script>
 
 <template>
+  <v-app>
+
   <header aria-label="Site Header">
     <v-toolbar
-      color="primary"
+      color="surface"
       density="compact"
       title="EAFC Trader"
     ></v-toolbar>
@@ -12,11 +14,12 @@
   <RouterView></RouterView>
 
   <v-footer
-    color="primary"
+    color="surface"
     density="compact"
   >
     <strong>Active session</strong>
   </v-footer>
+  </v-app>
 </template>
 
 <style scoped></style>

@@ -10,8 +10,12 @@ body {
   }
 
   .v-field__input {
-    background-color: var(--primary);
+    background-color: var(--v-theme-surface);
   }
+
+.v-btn-group {
+  height: auto !important;
+}
 
   .v-label.v-field-label {
     color: #fcfcf7 !important;
@@ -22,26 +26,14 @@ body {
     border-color: none;
   }
 
+  [type=text] {
+    background-color: inherit;
+  }
+
   
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
-  }
-
-  .btn-primary {
-    background-color: #fcfcf7 !important;
-
-    .v-btn__content {
-        color: #151616 !important;
-    }
-  }
-
-  .btn-active {
-    background-color: #07f468 !important;
-
-    .v-btn__content {
-        color: #151616 !important;
-    }
   }
 
   .v-card-text {
@@ -51,10 +43,22 @@ body {
     background-color: #222426;
   }
 
+  .v-field--disabled {
+    opacity: 1;
+  }
+
+  .v-badge__wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    right: 40px !important;
+  }
+
   .v-input__prepend {
     margin-right: 0 !important;
 
     button {
+        background: rgb(var(--v-theme-primary));
+        color: rgb(var(--v-theme-surface));
         border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
         height: 100% !important;
@@ -65,8 +69,10 @@ body {
     margin-left: 0 !important;
 
     button {
-        border-top-left-radius: 0 !important;
-        border-bottom-left-radius: 0 !important;
-        height: 100% !important;
+      background: rgb(var(--v-theme-primary));
+      color: rgb(var(--v-theme-surface));
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      height: 100% !important;
     }
   }

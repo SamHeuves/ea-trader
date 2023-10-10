@@ -6,7 +6,7 @@ import App from './app.vue'
 import './index.scss'
 
 import 'vuetify/styles'
-import { createVuetify  } from 'vuetify'
+import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
@@ -15,8 +15,8 @@ const myCustomLightTheme = {
   dark: false,
   colors: {
     background: '#000',
-    surface: '#FFFFFF',
-    primary: '#0f0f0f',
+    surface: '#0f0f0f',
+    primary: '#fcfcf7',
     'primary-darken-1': '#3700B3',
     secondary: '#787873',
     'secondary-darken-1': '#018786',
@@ -43,7 +43,6 @@ const vuetify = createVuetify({
       myCustomLightTheme,
     },
   },
-
 })
 
 routes.push({
