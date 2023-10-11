@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/v-on-event-hyphenation -->
 <template>
   <div
     v-show="pageload"
@@ -21,88 +22,91 @@
               </span>
               Select card type
             </template>
-
-            <v-card-text
-              v-if="selectElement"
-              class="flex flex-wrap"
-              style="flex-direction: column"
-            >
-              <v-item-group
-                v-model="selectElement"
-                mandatory
-                @update:modelValue="selectPlayer"
+            <v-expand-transition>
+              <v-card-text
+                v-show="selectElement"
+                class="flex flex-wrap"
+                style="flex-direction: column"
               >
-                <v-container>
-                  <v-row style="height: 110px">
-                    <v-col
-                      v-for="n in resultArray"
-                      :key="n.pid"
-                      :value="n"
-                      cols="3"
-                    >
-                      <v-item
+                <v-item-group
+                  v-model="selectElement"
+                  mandatory
+                  @update:modelValue="selectPlayer"
+                >
+                  <v-container>
+                    <v-row style="min-height: 110px">
+                      <v-col
+                        v-for="n in resultArray"
+                        :key="n.pid"
                         :value="n"
-                        v-slot="{ isSelected, toggle }"
+                        cols="3"
                       >
-                        <v-card
-                          flat
-                          style="background: none"
-                          :class="isSelected ? '' : 'blackWhite'"
-                          class="d-flex align-center justify-center"
-                          @click="toggle"
+                        <v-item
+                          v-slot="{ isSelected, toggle }"
+                          :value="n"
                         >
-                          <v-img
-                            :width="50"
-                            cover
-                            :src="
-                              'https://cdn.futwiz.com/assets/img/fc24/items/' +
-                              n.cardClass
-                            "
-                          ></v-img>
-                          <v-img
-                            style="width: 40px; position: absolute"
-                            cover
-                            :src="
-                              'https://cdn.futwiz.com/assets/img/fc24/faces/' +
-                              n.pid +
-                              '.png'
-                            "
-                          ></v-img>
-                        </v-card>
-                      </v-item>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-item-group>
-              <v-alert
-                variant="tonal"
-                border="top"
-                border-color="success"
-                elevation="2"
-              >
-                <span class="w-100 flex">
-                  <strong style="width: 100% !important; display: inline-block">
-                    {{ selectedPlayer.name }} ({{ selectedPlayer.rating }})
-                  </strong>
-                </span>
-                <span class="w-100 flex">
-                  <div class="flex w-100 items-center">
-                    <v-img
-                      :height="15"
-                      :max-width="20"
-                      src="https://www.ea.com/nl-nl/ea-sports-fc/ultimate-team/web-app/images/coinIcon.png"
-                    ></v-img>
-                    <span class="pl-1">
-                      {{ selectedPlayer.parsedPrice }}
-                      , {{ selectedPlayer.update }}
-                    </span>
-                  </div>
-                </span>
-              </v-alert>
-            </v-card-text>
-            <v-card-text v-else>
-              Please select a player from the webapp
-            </v-card-text>
+                          <v-card
+                            flat
+                            style="background: none"
+                            :class="isSelected ? '' : 'blackWhite'"
+                            class="d-flex align-center justify-center"
+                            @click="toggle"
+                          >
+                            <v-img
+                              :width="50"
+                              cover
+                              :src="
+                                'https://cdn.futwiz.com/assets/img/fc24/items/' +
+                                n.cardClass
+                              "
+                            ></v-img>
+                            <v-img
+                              style="width: 40px; position: absolute"
+                              cover
+                              :src="
+                                'https://cdn.futwiz.com/assets/img/fc24/faces/' +
+                                n.pid +
+                                '.png'
+                              "
+                            ></v-img>
+                          </v-card>
+                        </v-item>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-item-group>
+                <v-alert
+                  variant="tonal"
+                  border="top"
+                  border-color="success"
+                  elevation="2"
+                >
+                  <span class="w-100 flex">
+                    <strong
+                      style="width: 100% !important; display: inline-block"
+                    >
+                      {{ selectedPlayer.name }} ({{ selectedPlayer.rating }})
+                    </strong>
+                  </span>
+                  <span class="w-100 flex">
+                    <div class="flex w-100 items-center">
+                      <v-img
+                        :height="15"
+                        :max-width="20"
+                        src="https://www.ea.com/nl-nl/ea-sports-fc/ultimate-team/web-app/images/coinIcon.png"
+                      ></v-img>
+                      <span class="pl-1">
+                        {{ selectedPlayer.parsedPrice }}
+                        , {{ selectedPlayer.update }}
+                      </span>
+                    </div>
+                  </span>
+                </v-alert>
+              </v-card-text>
+              <v-card-text v-show="!element">
+                Please select a player from the webapp
+              </v-card-text>
+            </v-expand-transition>
           </v-card>
         </div>
       </div>
@@ -173,6 +177,29 @@
                       </v-text-field>
                     </v-col>
                   </v-row>
+                  <v-expand-transition>
+                    <v-alert
+                      v-show="!isNaN(profit)"
+                      variant="tonal"
+                      border="top"
+                      :border-color="percentage > 0 ? 'success' : 'negative'"
+                      elevation="2"
+                    >
+                      <span class="w-100 flex">
+                        <div class="flex w-100 items-center">
+                          <v-img
+                            :height="15"
+                            :max-width="20"
+                            src="https://www.ea.com/nl-nl/ea-sports-fc/ultimate-team/web-app/images/coinIcon.png"
+                          ></v-img>
+                          <span class="pl-1">
+                            {{ profit.toLocaleString() }}
+                          </span>
+                        </div>
+                        <div>{{ percentage }}%</div>
+                      </span>
+                    </v-alert>
+                  </v-expand-transition>
                 </v-window-item>
 
                 <v-window-item value="two">Two</v-window-item>
@@ -225,6 +252,8 @@ class Player {
   public name: string
   public rating: string
   public cardClass: string
+  public qualityDropdown: number
+  public rarityDropdown: number
 }
 
 let searching = ref(false)
@@ -236,13 +265,13 @@ let selectElement = ref()
 let sellPrice = ref()
 let buyPrice = ref()
 
-// const profit = computed(() => {
-//   return sellPrice.value - buyPrice.value
-// })
+const profit = computed(() => {
+  return sellPrice.value * 0.95 - buyPrice.value
+})
 
-// const percentage = computed(() => {
-//   return (profit.value / buyPrice.value) * 100
-// })
+const percentage = computed(() => {
+  return ((profit.value / buyPrice.value) * 100).toFixed(2)
+})
 
 const setButtonText = computed(() => {
   return searching.value ? 'Stop searching' : 'Start searching'
@@ -251,8 +280,22 @@ const setButtonText = computed(() => {
 function selectPlayer(x: Player) {
   selectedPlayer.value = x
   sellPrice.value = x.price
-  buyPrice.value = x.price * 0.95
+  buyPrice.value = x.price
+  parent.postMessage(
+    {
+      action: 'cardSelected',
+      qualityDropdown: x.qualityDropdown,
+      rarityDropdown: x.rarityDropdown,
+    },
+    '*'
+  )
 }
+
+watch(buyPrice, async (newVal, oldVal) => {
+  if (newVal != oldVal) {
+    parent.postMessage({ action: 'buyNowChanged', newVal }, '*')
+  }
+})
 
 onMounted(() => {
   const searchButton = document.getElementById('search')!
@@ -276,6 +319,7 @@ onMounted(() => {
     const { data } = event
 
     if (data.action == 'pageChange') {
+      resultArray.value = []
       transferSearch.value = data.transferSearch
       pageload.value = data.loading
     } else if (data.action == 'playerSelected') {
@@ -301,7 +345,11 @@ onMounted(() => {
                     : price.data.player.pid,
                   name: price.data.player.common_name,
                   rating: price.data.player.rating,
-                  cardClass: cardType(price.data.player.appclass),
+                  cardClass: cardType(price.data.player.appclass).imageSrc,
+                  qualityDropdown: cardType(price.data.player.appclass)
+                    .qualityDropdown,
+                  rarityDropdown: cardType(price.data.player.appclass)
+                    .rarityDropdown,
                 }
 
                 if (player.update != 'Never') {

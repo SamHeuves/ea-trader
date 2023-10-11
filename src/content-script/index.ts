@@ -119,4 +119,59 @@ window.addEventListener('message', async (event) => {
   if (data.action == 'startSearch') {
     startSearch(searching)
   }
+
+  // Start or stop searching
+  if (data.action == 'cardSelected') {
+    console.log(data)
+    if (data.rarityDropdown != -1) {
+      if (data.qualityDropdown != -1) {
+        const qualityDropdown = document
+          .querySelector('.ut-item-search-view')!
+          .querySelectorAll(
+            '.inline-list-select .ut-search-filter-control--row'
+          )[0]
+
+        click(qualityDropdown).then(() => {
+          const options = document
+            .querySelector('.ut-item-search-view')!
+            .querySelectorAll('.inline-list > li')
+          click(options[data.qualityDropdown])
+        })
+      }
+
+      const rarityDropdown = document
+        .querySelector('.ut-item-search-view')!
+        .querySelectorAll(
+          '.inline-list-select .ut-search-filter-control--row'
+        )[1]
+
+      setTimeout(() => {
+        click(rarityDropdown).then(() => {
+          const options = document
+            .querySelector('.ut-item-search-view')!
+            .querySelectorAll('.inline-list > li')
+          click(options[data.rarityDropdown])
+        })
+      }, 100)
+    } else {
+      click(document.querySelectorAll('.ut-search-filter-control button')[1])
+    }
+  }
+
+  if (data.action == 'buyNowChanged') {
+    // Init change event
+    const event = new UIEvent('change', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+
+    const buyNowFilter = document
+      .querySelectorAll('.price-filter')[3]
+      .getElementsByTagName('input')[0]
+
+    buyNowFilter.value = data.newVal
+
+    buyNowFilter.dispatchEvent(event)
+  }
 })

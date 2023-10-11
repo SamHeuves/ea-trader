@@ -1,94 +1,129 @@
 export default function cardType(cardType: string) {
-  console.log(cardType)
-
-  let imageSrc = ''
+  const card = {
+    imageSrc: '',
+    qualityDropdown: -1,
+    rarityDropdown: -1,
+  }
 
   switch (cardType) {
     // Gold rare
     case 'card-24-small-gold':
-      imageSrc = 'fc24-gold-2.png'
+      card.imageSrc = 'fc24-gold-2.png'
+      card.qualityDropdown = 3
+      card.rarityDropdown = 2
       break
 
     // Gold common
     case 'card-24-small-gold-nr':
-      imageSrc = 'fc24-gold-1.png'
+      card.imageSrc = 'fc24-gold-1.png'
+      card.qualityDropdown = 3
+      card.rarityDropdown = 1
       break
 
     // Gold IF
     case 'card-24-small-goldif':
-      imageSrc = 'gold-if.png'
+      card.imageSrc = 'gold-if.png'
+      card.qualityDropdown = 3
+      card.rarityDropdown = 11
       break
 
     // Silver rare
     case 'card-24-small-silver':
-      imageSrc = 'fc24-silver-2.png'
+      card.imageSrc = 'fc24-silver-2.png'
+      card.qualityDropdown = 2
+      card.rarityDropdown = 2
       break
 
     // Silver common
     case 'card-24-small-silver-nr':
-      imageSrc = 'fc24-silver-1.png'
+      card.imageSrc = 'fc24-silver-1.png'
+      card.qualityDropdown = 2
+      card.rarityDropdown = 1
       break
 
     // Silver IF
     case 'card-24-small-silverif':
-      imageSrc = 'silver-if.png'
+      card.imageSrc = 'silver-if.png'
+      card.qualityDropdown = 2
+      card.rarityDropdown = 11
       break
 
     // Bronze rare
     case 'card-24-small-bronze':
-      imageSrc = 'fc24-bronze-2.png'
+      card.imageSrc = 'fc24-bronze-2.png'
+      card.qualityDropdown = 1
+      card.rarityDropdown = 2
       break
 
     // Bronze common
     case 'card-24-small-bronze-nr':
-      imageSrc = 'fc24-silver-1.png'
+      card.imageSrc = 'fc24-bronze-1.png'
+      card.qualityDropdown = 1
+      card.rarityDropdown = 1
       break
 
     // Bronze IF
     case 'card-24-small-bronzeif':
-      imageSrc = 'bronze-if.png'
+      card.imageSrc = 'bronze-if.png'
+      card.qualityDropdown = 1
+      card.rarityDropdown = 11
       break
 
     // RTTKO Champions League
     case 'card-24-small-50':
-      imageSrc = '50.png'
+      card.imageSrc = '50.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 10
       break
 
     // RTTKO Champions League (F)
     case 'card-24-small-31':
-      imageSrc = '31.png'
+      card.imageSrc = '31.png'
+      card.qualityDropdown = 4
       break
 
     // RTTKO Conference League
     case 'card-24-small-105':
-      imageSrc = '105.png'
+      card.imageSrc = '105.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 13
       break
 
     // RTTKO Europe League
     case 'card-24-small-46':
-      imageSrc = '46.png'
+      card.imageSrc = '46.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 17
       break
 
     // Icon
     case 'card-24-small-icon':
-      imageSrc = 'icon.png'
+      card.imageSrc = 'icon.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 7
       break
 
     // Hero base
     case 'card-24-small-futhero':
-      imageSrc = 'hero.png'
+      card.imageSrc = 'hero.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 18
       break
 
     // Hero advanced
     case 'card-24-small-171':
-      imageSrc = '171.png'
+      card.imageSrc = '171.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 16
       break
 
     // Nike mad
     case 'card-24-small-182':
-      imageSrc = '182.png'
+      card.imageSrc = '182.png'
+      card.qualityDropdown = 4
+      card.rarityDropdown = 9
       break
   }
 
-  return imageSrc
+  return card
 }
