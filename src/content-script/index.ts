@@ -64,18 +64,19 @@ insertionQ('.ut-root-view').every(function (element: HTMLElement) {
 insertionQ('.ut-navigation-container-view--content > div').every(function (
   element: HTMLElement
 ) {
+  transferSearch = false
+  loading = false
+
   // Check if we are on the transfer search page
-  if (element.classList.contains('ut-market-search-filters-view')) {
+  if (
+    element.classList.contains('ut-market-search-filters-view') ||
+    element.classList.contains('ut-split-view') ||
+    element.classList.contains('DetailView')
+  ) {
     playerSelection(iFrame)
     buyNowInput(iFrame)
-
     transferSearch = true
-  } else {
-    transferSearch = false
   }
-
-  // Stop loader
-  loading = false
 
   // Post to iFrame that page is loaded
   if (iFrame.contentWindow) {
@@ -86,27 +87,161 @@ insertionQ('.ut-navigation-container-view--content > div').every(function (
   }
 })
 
+function setFilter(maxBuy: string) {
+  const changeEvent = new UIEvent('change', {
+    view: window,
+    bubbles: true,
+    cancelable: true,
+  })
+
+  click(
+    document
+      .querySelectorAll('.price-filter')[2]
+      .getElementsByTagName('button')[1]
+  )
+
+  if (
+    document
+      .querySelectorAll('.price-filter')[2]
+      .getElementsByTagName('input')[0].value == maxBuy
+  ) {
+    document
+      .querySelectorAll('.price-filter')[2]
+      .getElementsByTagName('input')[0].value = 0
+    document
+      .querySelectorAll('.price-filter')[2]
+      .getElementsByTagName('input')[0]
+      .dispatchEvent(changeEvent)
+  } else {
+    click(
+      document
+        .querySelectorAll('.price-filter')[2]
+        .getElementsByTagName('button')[1]
+    )
+  }
+
+  document
+    .querySelectorAll('.price-filter')[3]
+    .getElementsByTagName('input')[0].value = maxBuy
+
+  document
+    .querySelectorAll('.price-filter')[3]
+    .getElementsByTagName('input')[0]
+    .dispatchEvent(changeEvent)
+}
+
 // Event for listening to messages from iFrame
 window.addEventListener('message', async (event) => {
   const { data } = event
   searching = data.searching
+  let count = 0
+  const setCount = 20
+  const pauseTime = 120
 
-  function startSearch(val: boolean) {
+  const changeEvent = new UIEvent('change', {
+    view: window,
+    bubbles: true,
+    cancelable: true,
+  })
+
+  function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
     // Stop searching if button is clicked again
     if (!val) {
       return false
     }
 
     // Loop for searching the transferlist
-    searchLoop(val)
-      .then(() => {
-        setTimeout(() => {
-          startSearch(searching)
-        }, 1000)
-      })
-      .catch(() => {
-        searching = false
-      })
+    if (count < setCount) {
+      searchLoop(val)
+        .then((results: number) => {
+          if (!searching) {
+            return false
+          }
+
+          switch (true) {
+            case results == 0:
+              setTimeout(function () {
+                click('.ut-navigation-button-control')
+              }, 1000)
+              break
+            case results > 10:
+              searching = false
+              break
+            default:
+              click('.buyButton').then(() => {
+                insertionQ('.ea-dialog-view--body').every(function () {
+                  click('.ea-dialog-view--body .ut-button-group button').then(
+                    () => {
+                      insertionQ('.ut-quick-list-panel-view').every(
+                        function () {
+                          click('.accordian').then(() => {
+                            const buyNowEl = document
+                              .querySelectorAll('.panelActionRow')[2]
+                              .querySelector('input')!
+                            const bidEl = document
+                              .querySelectorAll('.panelActionRow')[1]
+                              .querySelector('input')!
+                            bidEl.value = sellPrice
+                            buyNowEl.value = sellPrice
+                            buyNowEl.dispatchEvent(changeEvent)
+                            click(
+                              document
+                                .querySelector('.panelActions')!
+                                .querySelectorAll('button')[4]
+                            ).then(() => {
+                              setTimeout(() => {
+                                click('.ut-navigation-button-control')
+                                console.log('click 1')
+                              }, 1000)
+                            })
+                          })
+                        }
+                      )
+                    }
+                  )
+                })
+              })
+          }
+        })
+        .catch(() => {
+          searching = false
+        })
+        .finally(() => {
+          count += 1
+          if (iFrame.contentWindow) {
+            iFrame.contentWindow.postMessage(
+              {
+                action: 'searchCount',
+                count,
+                setCount,
+                pauseTime,
+                searching,
+              },
+              '*'
+            )
+          }
+
+          setTimeout(() => {
+            console.log('click2')
+            setFilter(maxBuy)
+            startSearch(searching, maxBuy, sellPrice)
+          }, 3000)
+        })
+    } else {
+      count = 0
+      if (iFrame.contentWindow) {
+        iFrame.contentWindow.postMessage(
+          {
+            action: 'startBreak',
+            count,
+            setCount,
+            pauseTime,
+            searching,
+          },
+          '*'
+        )
+      }
+    }
   }
 
   // Go to transferlist page
@@ -117,12 +252,14 @@ window.addEventListener('message', async (event) => {
 
   // Start or stop searching
   if (data.action == 'startSearch') {
-    startSearch(searching)
+    const maxBuy = data.buyPrice
+    const sellPrice = data.sellPrice
+    startSearch(searching, maxBuy, sellPrice)
   }
 
-  // Start or stop searching
+  // When a card version is selected
+  // set the dropdown values
   if (data.action == 'cardSelected') {
-    console.log(data)
     if (data.rarityDropdown != -1) {
       if (data.qualityDropdown != -1) {
         const qualityDropdown = document
@@ -158,6 +295,7 @@ window.addEventListener('message', async (event) => {
     }
   }
 
+  // When the buy now value is changed
   if (data.action == 'buyNowChanged') {
     // Init change event
     const event = new UIEvent('change', {

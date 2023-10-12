@@ -182,7 +182,7 @@
                       v-show="!isNaN(profit)"
                       variant="tonal"
                       border="top"
-                      :border-color="percentage > 0 ? 'success' : 'negative'"
+                      :border-color="percentage > 0 ? 'success' : 'error'"
                       elevation="2"
                     >
                       <span class="w-100 flex">
@@ -213,10 +213,22 @@
     </div>
   </v-expand-transition>
   <div class="ma-5">
+    <v-progress-linear
+      :model-value="progressValue"
+      color="success"
+      height="25"
+      striped
+    >
+      <template #default="{ value }">
+        <strong v-if="!searchBreak">{{ searchCount }} / {{ setCount }}</strong>
+        <strong v-else>{{ breakTime }}</strong>
+      </template>
+    </v-progress-linear>
     <v-expand-transition>
       <v-btn
         v-show="transferSearch && !pageload"
         id="search"
+        :disabled="percentage < 0"
         :color="!searching ? 'primary' : 'success'"
         block
         rounded
@@ -257,6 +269,7 @@ class Player {
 }
 
 let searching = ref(false)
+let searchBreak = ref(false)
 let transferSearch = ref(false)
 let pageload = ref(true)
 let selectedPlayer = ref({})
@@ -264,6 +277,11 @@ let resultArray: Ref<Player[]> = ref([])
 let selectElement = ref()
 let sellPrice = ref()
 let buyPrice = ref()
+let searchCount = ref(0)
+let setCount = ref(20)
+let breakTime = ref(0)
+let initialBreakTime = ref(0)
+let progressValue = ref(0)
 
 const profit = computed(() => {
   return sellPrice.value * 0.95 - buyPrice.value
@@ -291,6 +309,26 @@ function selectPlayer(x: Player) {
   )
 }
 
+function countDownTimer() {
+  if (breakTime.value > 0) {
+    setTimeout(() => {
+      breakTime.value -= 1
+      progressValue.value = (100 / initialBreakTime.value) * breakTime.value
+      countDownTimer()
+    }, 1000)
+  } else {
+    parent.postMessage(
+      {
+        action: 'startSearch',
+        searching: searching.value,
+        buyPrice: buyPrice.value,
+        sellPrice: sellPrice.value,
+      },
+      '*'
+    )
+  }
+}
+
 watch(buyPrice, async (newVal, oldVal) => {
   if (newVal != oldVal) {
     parent.postMessage({ action: 'buyNowChanged', newVal }, '*')
@@ -303,7 +341,12 @@ onMounted(() => {
   searchButton.addEventListener('click', async () => {
     searching.value = !searching.value
     parent.postMessage(
-      { action: 'startSearch', searching: searching.value },
+      {
+        action: 'startSearch',
+        searching: searching.value,
+        buyPrice: buyPrice.value,
+        sellPrice: sellPrice.value,
+      },
       '*'
     )
   })
@@ -319,7 +362,6 @@ onMounted(() => {
     const { data } = event
 
     if (data.action == 'pageChange') {
-      resultArray.value = []
       transferSearch.value = data.transferSearch
       pageload.value = data.loading
     } else if (data.action == 'playerSelected') {
@@ -365,6 +407,20 @@ onMounted(() => {
         })
     } else if (data.action == 'buyNowChanged') {
       buyPrice.value = data.value
+    } else if (data.action == 'searchCount') {
+      searchCount.value = data.count
+      searching.value = data.searching
+      searchBreak.value = false
+      setCount.value = data.setCount
+      progressValue.value = (100 / setCount.value) * searchCount.value
+    } else if (data.action == 'startBreak') {
+      searchCount.value = data.count
+      searching.value = data.searching
+      searchBreak.value = true
+      setCount.value = data.setCount
+      breakTime.value = data.pauseTime
+      initialBreakTime.value = data.pauseTime
+      countDownTimer()
     }
   })
 })

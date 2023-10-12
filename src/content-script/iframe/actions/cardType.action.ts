@@ -100,7 +100,7 @@ export default function cardType(cardType: string) {
     case 'card-24-small-icon':
       card.imageSrc = 'icon.png'
       card.qualityDropdown = 4
-      card.rarityDropdown = 7
+      card.rarityDropdown = 5
       break
 
     // Hero base

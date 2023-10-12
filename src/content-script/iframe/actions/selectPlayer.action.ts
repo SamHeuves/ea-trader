@@ -37,8 +37,10 @@ export default function playerSelection(iFrame: HTMLIFrameElement) {
 
   const target = document.querySelector('.ut-player-search-control')
 
-  observer.observe(target as Node, {
-    subtree: true,
-    childList: true,
-  })
+  if (target) {
+    observer.observe(target as Node, {
+      subtree: true,
+      childList: true,
+    })
+  }
 }
