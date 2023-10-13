@@ -5,12 +5,23 @@ import insertionQ from 'insertion-query'
 import click from './iframe/actions/click.action'
 import playerSelection from './iframe/actions/selectPlayer.action'
 import buyNowInput from './iframe/actions/buyNow.action'
+import searchResults from './iframe/actions/searchResults.action'
 
 // Init variables
 const iFrame = document.createElement('iframe')
 let transferSearch: boolean
+let resultPage: boolean
 let searching: boolean
 let loading: boolean
+let count: number = 0
+let sessionCount: number = 0
+const setCount: number = 20
+const pauseTime: number = 120
+const changeEvent = new UIEvent('change', {
+  view: window,
+  bubbles: true,
+  cancelable: true,
+})
 
 /**
  * The code below will get everything going. Initialize the iFrame with defaults and add it to the page.
@@ -65,35 +76,32 @@ insertionQ('.ut-navigation-container-view--content > div').every(function (
   element: HTMLElement
 ) {
   transferSearch = false
+  resultPage = false
   loading = false
 
   // Check if we are on the transfer search page
-  if (
-    element.classList.contains('ut-market-search-filters-view') ||
-    element.classList.contains('ut-split-view') ||
-    element.classList.contains('DetailView')
-  ) {
+  if (element.classList.contains('ut-market-search-filters-view')) {
     playerSelection(iFrame)
     buyNowInput(iFrame)
     transferSearch = true
+  } else if (
+    element.classList.contains('ut-split-view') ||
+    element.classList.contains('DetailView')
+  ) {
+    transferSearch = true
+    resultPage = true
   }
 
   // Post to iFrame that page is loaded
   if (iFrame.contentWindow) {
     iFrame.contentWindow.postMessage(
-      { action: 'pageChange', transferSearch, loading },
+      { action: 'pageChange', transferSearch, resultPage, loading },
       '*'
     )
   }
 })
 
 function setFilter(maxBuy: string) {
-  const changeEvent = new UIEvent('change', {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  })
-
   click(
     document
       .querySelectorAll('.price-filter')[2]
@@ -130,119 +138,118 @@ function setFilter(maxBuy: string) {
     .dispatchEvent(changeEvent)
 }
 
+function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
+  // Stop searching if button is clicked again
+  if (!val) {
+    return false
+  }
+
+  setFilter(maxBuy)
+
+  // Loop for searching the transferlist
+  searchLoop(val, iFrame, count, setCount, sessionCount).then(
+    (result: object) => {
+      if (!searching) {
+        return false
+      }
+      sessionCount += 1
+      count += 1
+
+      searchResults(result.length, searching)
+        .then(() => {
+          click('.buyButton').then(() => {
+            insertionQ('.ea-dialog-view--body').every(function () {
+              click('.ea-dialog-view--body .ut-button-group button').then(
+                () => {
+                  insertionQ('.negative').every(function () {
+                    // Failed buynow
+                    click('.ut-navigation-button-control').then(() => {
+                      if (iFrame.contentWindow) {
+                        iFrame.contentWindow.postMessage(
+                          {
+                            action: 'searchAction',
+                            purchase: false,
+                            count,
+                            sessionCount,
+                          },
+                          '*'
+                        )
+                      }
+
+                      startSearch(searching, maxBuy, sellPrice)
+                    })
+                  })
+                  insertionQ('.accordian').every(function (
+                    element: HTMLElement
+                  ) {
+                    click('.accordian').then(() => {
+                      const buyNowEl = document
+                        .querySelectorAll('.panelActionRow')[2]
+                        .querySelector('input')!
+                      const bidEl = document
+                        .querySelectorAll('.panelActionRow')[1]
+                        .querySelector('input')!
+                      bidEl.value = sellPrice
+                      buyNowEl.value = sellPrice
+                      buyNowEl.dispatchEvent(changeEvent)
+                      click(
+                        document
+                          .querySelector('.panelActions')!
+                          .querySelectorAll('button')[4]
+                      ).then(() => {
+                        if (iFrame.contentWindow) {
+                          iFrame.contentWindow.postMessage(
+                            {
+                              action: 'searchAction',
+                              purchase: true,
+                              count,
+                              sessionCount,
+                            },
+                            '*'
+                          )
+                        }
+                        click('.ut-navigation-button-control')
+                        setTimeout(() => {
+                          startSearch(searching, maxBuy, sellPrice)
+                        }, 3000)
+                      })
+                    })
+                  })
+                }
+              )
+            })
+          })
+        })
+        .catch((error) => {
+          searching = error
+          startSearch(searching, maxBuy, sellPrice)
+        })
+        .finally(() => {
+          if (count == setCount) {
+            count = 0
+            if (iFrame.contentWindow) {
+              iFrame.contentWindow.postMessage(
+                {
+                  action: 'startBreak',
+                  count,
+                  setCount,
+                  pauseTime,
+                  searching,
+                  sessionCount,
+                },
+                '*'
+              )
+            }
+          }
+        })
+    }
+  )
+}
+
 // Event for listening to messages from iFrame
 window.addEventListener('message', async (event) => {
   const { data } = event
   searching = data.searching
-  let count = 0
-  const setCount = 20
-  const pauseTime = 120
-
-  const changeEvent = new UIEvent('change', {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  })
-
-  function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
-    // Stop searching if button is clicked again
-    if (!val) {
-      return false
-    }
-
-    // Loop for searching the transferlist
-    if (count < setCount) {
-      searchLoop(val)
-        .then((results: number) => {
-          if (!searching) {
-            return false
-          }
-
-          switch (true) {
-            case results == 0:
-              setTimeout(function () {
-                click('.ut-navigation-button-control')
-              }, 1000)
-              break
-            case results > 10:
-              searching = false
-              break
-            default:
-              click('.buyButton').then(() => {
-                insertionQ('.ea-dialog-view--body').every(function () {
-                  click('.ea-dialog-view--body .ut-button-group button').then(
-                    () => {
-                      insertionQ('.ut-quick-list-panel-view').every(
-                        function () {
-                          click('.accordian').then(() => {
-                            const buyNowEl = document
-                              .querySelectorAll('.panelActionRow')[2]
-                              .querySelector('input')!
-                            const bidEl = document
-                              .querySelectorAll('.panelActionRow')[1]
-                              .querySelector('input')!
-                            bidEl.value = sellPrice
-                            buyNowEl.value = sellPrice
-                            buyNowEl.dispatchEvent(changeEvent)
-                            click(
-                              document
-                                .querySelector('.panelActions')!
-                                .querySelectorAll('button')[4]
-                            ).then(() => {
-                              setTimeout(() => {
-                                click('.ut-navigation-button-control')
-                                console.log('click 1')
-                              }, 1000)
-                            })
-                          })
-                        }
-                      )
-                    }
-                  )
-                })
-              })
-          }
-        })
-        .catch(() => {
-          searching = false
-        })
-        .finally(() => {
-          count += 1
-          if (iFrame.contentWindow) {
-            iFrame.contentWindow.postMessage(
-              {
-                action: 'searchCount',
-                count,
-                setCount,
-                pauseTime,
-                searching,
-              },
-              '*'
-            )
-          }
-
-          setTimeout(() => {
-            console.log('click2')
-            setFilter(maxBuy)
-            startSearch(searching, maxBuy, sellPrice)
-          }, 3000)
-        })
-    } else {
-      count = 0
-      if (iFrame.contentWindow) {
-        iFrame.contentWindow.postMessage(
-          {
-            action: 'startBreak',
-            count,
-            setCount,
-            pauseTime,
-            searching,
-          },
-          '*'
-        )
-      }
-    }
-  }
 
   // Go to transferlist page
   if (data.action == 'goToTransferList') {
@@ -252,8 +259,10 @@ window.addEventListener('message', async (event) => {
 
   // Start or stop searching
   if (data.action == 'startSearch') {
+    searching = data.searching
     const maxBuy = data.buyPrice
     const sellPrice = data.sellPrice
+
     startSearch(searching, maxBuy, sellPrice)
   }
 

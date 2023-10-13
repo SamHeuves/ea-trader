@@ -220,10 +220,14 @@
       striped
     >
       <template #default="{ value }">
-        <strong v-if="!searchBreak">{{ searchCount }} / {{ setCount }}</strong>
+        <strong v-if="!searchBreak">
+          {{ searchCount }} / {{ setCount }} / {{ sessionCount }}
+        </strong>
         <strong v-else>{{ breakTime }}</strong>
       </template>
     </v-progress-linear>
+    {{ actionsArray }}
+
     <v-expand-transition>
       <v-btn
         v-show="transferSearch && !pageload"
@@ -274,11 +278,13 @@ let transferSearch = ref(false)
 let pageload = ref(true)
 let selectedPlayer = ref({})
 let resultArray: Ref<Player[]> = ref([])
+let actionsArray: Ref<never[]> = ref([])
 let selectElement = ref()
+let sessionCount = ref(0)
 let sellPrice = ref()
 let buyPrice = ref()
 let searchCount = ref(0)
-let setCount = ref(20)
+let setCount = ref(0)
 let breakTime = ref(0)
 let initialBreakTime = ref(0)
 let progressValue = ref(0)
@@ -408,8 +414,10 @@ onMounted(() => {
     } else if (data.action == 'buyNowChanged') {
       buyPrice.value = data.value
     } else if (data.action == 'searchCount') {
+      console.log(data)
       searchCount.value = data.count
       searching.value = data.searching
+      sessionCount.value = data.sessionCount
       searchBreak.value = false
       setCount.value = data.setCount
       progressValue.value = (100 / setCount.value) * searchCount.value
@@ -418,9 +426,14 @@ onMounted(() => {
       searching.value = data.searching
       searchBreak.value = true
       setCount.value = data.setCount
+      sessionCount.value = data.sessionCount
       breakTime.value = data.pauseTime
       initialBreakTime.value = data.pauseTime
       countDownTimer()
+    } else if (data.action == 'searchAction') {
+      let action = data
+      actionsArray.value.push(action)
+      console.log(actionsArray)
     }
   })
 })

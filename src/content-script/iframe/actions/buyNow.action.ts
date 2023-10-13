@@ -1,7 +1,7 @@
 export default function buyNowInput(iFrame: HTMLIFrameElement) {
   const buyNowInput = document
     .querySelectorAll('.price-filter')[3]
-    .getElementsByTagName('input')[0]
+    .querySelectorAll('input')[0]
 
   const buttons = document
     .querySelectorAll('.price-filter')[3]
