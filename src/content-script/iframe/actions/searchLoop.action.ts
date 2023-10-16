@@ -9,6 +9,8 @@ export default function (
   sessionCount: number
 ) {
   return new Promise<object>(function (resolve, reject) {
+    let length: number = 0;
+
     if (searching && count < setCount) {
       count += 1
       sessionCount += 1
@@ -27,33 +29,17 @@ export default function (
               '*'
             )
           }
-
-          setTimeout(() => {
-            if (document.querySelector('.SearchResults')) {
-              let length = 0
-              setTimeout(() => {
-                if (document.querySelector('.listFUTItem')) {
-                  length = document.querySelectorAll(
-                    '.paginated-item-list > ul > li'
-                  ).length
-                }
-                resolve({ length, count })
-              }, 1000)
-            }
-            insertionQ('.SearchResults').every(function () {
-              let length = 0
-              setTimeout(() => {
-                if (document.querySelector('.listFUTItem')) {
-                  length = document.querySelectorAll(
-                    '.paginated-item-list > ul > li'
-                  ).length
-                }
-                resolve({ length, count })
-              }, 1000)
+          
+          insertionQ('.ut-pinned-list > ul').every(function (element: HTMLElement) {
+            insertionQ('.listFUTItem').every(function () {
+              length = element.querySelectorAll('li.listFUTItem').length
             })
-          }, 1000)
+          })
         }
-      )
+      ).finally(() => {
+        resolve({ length, count })
+
+      })
     } else {
       reject({ length, count })
     }

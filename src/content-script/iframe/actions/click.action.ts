@@ -1,5 +1,9 @@
+
+import insertionQ from 'insertion-query'
+
 export default function click(selector: string | Element) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    const eventList = ['mouseover', 'mousedown', 'mouseup', 'click']
     let element = selector
 
     if (typeof selector != 'object') {
@@ -12,14 +16,20 @@ export default function click(selector: string | Element) {
       node.dispatchEvent(clickEvent)
     }
 
-    if (typeof element == 'object') {
-      triggerMouseEvent(element, 'mouseover')
-      triggerMouseEvent(element, 'mousedown')
-      triggerMouseEvent(element, 'mouseup')
-      triggerMouseEvent(element, 'click')
+    function clickFunction(element: Element) {
+      eventList.forEach((x) => {
+        triggerMouseEvent(element, x)
+      })
+    }
+
+    if (element && typeof element == 'object') {
+      clickFunction(element);
       resolve({ success: element })
     } else {
-      reject({ fail: element })
+      insertionQ(selector).every(function (element: HTMLElement) {
+        clickFunction(element);
+        resolve({ success: element })
+      })  
     }
   })
 }

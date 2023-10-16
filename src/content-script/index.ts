@@ -140,25 +140,28 @@ function setFilter(maxBuy: string) {
 
 function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
   // Stop searching if button is clicked again
-  if (!val) {
+  if (!searching) {
     return false
   }
 
   setFilter(maxBuy)
 
   // Loop for searching the transferlist
-  searchLoop(val, iFrame, count, setCount, sessionCount).then(
+  searchLoop(searching, iFrame, count, setCount, sessionCount).then(
     (result: object) => {
       if (!searching) {
         return false
       }
+
+      console.log(result);
+
       sessionCount += 1
       count += 1
 
       searchResults(result.length, searching)
         .then(() => {
           click('.buyButton').then(() => {
-            insertionQ('.ea-dialog-view--body').every(function () {
+            // insertionQ('.ea-dialog-view--body').every(function () {
               click('.ea-dialog-view--body .ut-button-group button').then(
                 () => {
                   insertionQ('.negative').every(function () {
@@ -179,9 +182,6 @@ function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
                       startSearch(searching, maxBuy, sellPrice)
                     })
                   })
-                  insertionQ('.accordian').every(function (
-                    element: HTMLElement
-                  ) {
                     click('.accordian').then(() => {
                       const buyNowEl = document
                         .querySelectorAll('.panelActionRow')[2]
@@ -214,15 +214,15 @@ function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
                         }, 3000)
                       })
                     })
-                  })
                 }
               )
-            })
           })
         })
         .catch((error) => {
           searching = error
-          startSearch(searching, maxBuy, sellPrice)
+          if (searching) {
+            startSearch(searching, maxBuy, sellPrice)
+          }
         })
         .finally(() => {
           if (count == setCount) {
@@ -259,11 +259,14 @@ window.addEventListener('message', async (event) => {
 
   // Start or stop searching
   if (data.action == 'startSearch') {
-    searching = data.searching
-    const maxBuy = data.buyPrice
-    const sellPrice = data.sellPrice
+    if(searching) {
+      const maxBuy = data.buyPrice
+      const sellPrice = data.sellPrice
+  
+      startSearch(searching, maxBuy, sellPrice)
+    }
 
-    startSearch(searching, maxBuy, sellPrice)
+    console.log(searching)
   }
 
   // When a card version is selected
