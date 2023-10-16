@@ -345,6 +345,10 @@ onMounted(() => {
   const searchButton = document.getElementById('search')!
 
   searchButton.addEventListener('click', async () => {
+    searchCount.value = 0
+    breakTime.value = 0
+    progressValue.value = 0
+    searchBreak.value = false
     searching.value = !searching.value
     parent.postMessage(
       {
@@ -414,7 +418,6 @@ onMounted(() => {
     } else if (data.action == 'buyNowChanged') {
       buyPrice.value = data.value
     } else if (data.action == 'searchCount') {
-      console.log(data)
       searchCount.value = data.count
       searching.value = data.searching
       sessionCount.value = data.sessionCount
@@ -433,7 +436,6 @@ onMounted(() => {
     } else if (data.action == 'searchAction') {
       let action = data
       actionsArray.value.push(action)
-      console.log(actionsArray)
     }
   })
 })

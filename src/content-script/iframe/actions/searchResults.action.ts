@@ -1,12 +1,10 @@
 import click from '../actions/click.action'
 
 export default function searchResults(results: number, searching: boolean) {
-
   return new Promise<number | void>(function (resolve, reject) {
     switch (true) {
       case results == 0:
         setTimeout(() => {
-
           click('.ut-navigation-button-control').then(() => {
             reject(searching)
           })
@@ -19,6 +17,5 @@ export default function searchResults(results: number, searching: boolean) {
       default:
         resolve()
     }
-
   })
 }

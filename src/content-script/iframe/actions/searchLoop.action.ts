@@ -9,14 +9,14 @@ export default function (
   sessionCount: number
 ) {
   return new Promise<object>(function (resolve, reject) {
-    let length: number = 0;
+    let length: number = 0
 
     if (searching && count < setCount) {
       count += 1
       sessionCount += 1
 
-      click('.ut-market-search-filters-view .btn-standard.call-to-action').then(
-        () => {
+      click('.ut-market-search-filters-view .btn-standard.call-to-action')
+        .then(() => {
           if (iFrame.contentWindow) {
             iFrame.contentWindow.postMessage(
               {
@@ -29,17 +29,18 @@ export default function (
               '*'
             )
           }
-          
-          insertionQ('.ut-pinned-list > ul').every(function (element: HTMLElement) {
+
+          insertionQ('.ut-pinned-list > ul').every(function (
+            element: HTMLElement
+          ) {
             insertionQ('.listFUTItem').every(function () {
               length = element.querySelectorAll('li.listFUTItem').length
             })
           })
-        }
-      ).finally(() => {
-        resolve({ length, count })
-
-      })
+        })
+        .finally(() => {
+          resolve({ length, count })
+        })
     } else {
       reject({ length, count })
     }

@@ -147,13 +147,11 @@ function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
   setFilter(maxBuy)
 
   // Loop for searching the transferlist
-  searchLoop(searching, iFrame, count, setCount, sessionCount).then(
-    (result: object) => {
+  searchLoop(searching, iFrame, count, setCount, sessionCount)
+    .then((result: object) => {
       if (!searching) {
         return false
       }
-
-      console.log(result);
 
       sessionCount += 1
       count += 1
@@ -162,88 +160,82 @@ function startSearch(val: boolean, maxBuy: string, sellPrice: string) {
         .then(() => {
           click('.buyButton').then(() => {
             // insertionQ('.ea-dialog-view--body').every(function () {
-              click('.ea-dialog-view--body .ut-button-group button').then(
-                () => {
-                  insertionQ('.negative').every(function () {
-                    // Failed buynow
-                    click('.ut-navigation-button-control').then(() => {
-                      if (iFrame.contentWindow) {
-                        iFrame.contentWindow.postMessage(
-                          {
-                            action: 'searchAction',
-                            purchase: false,
-                            count,
-                            sessionCount,
-                          },
-                          '*'
-                        )
-                      }
+            click('.ea-dialog-view--body .ut-button-group button').then(() => {
+              insertionQ('.negative').every(function () {
+                // Failed buynow
+                click('.ut-navigation-button-control').then(() => {
+                  if (iFrame.contentWindow) {
+                    iFrame.contentWindow.postMessage(
+                      {
+                        action: 'searchAction',
+                        purchase: false,
+                        count,
+                        sessionCount,
+                      },
+                      '*'
+                    )
+                  }
 
-                      startSearch(searching, maxBuy, sellPrice)
-                    })
-                  })
-                    click('.accordian').then(() => {
-                      const buyNowEl = document
-                        .querySelectorAll('.panelActionRow')[2]
-                        .querySelector('input')!
-                      const bidEl = document
-                        .querySelectorAll('.panelActionRow')[1]
-                        .querySelector('input')!
-                      bidEl.value = sellPrice
-                      buyNowEl.value = sellPrice
-                      buyNowEl.dispatchEvent(changeEvent)
-                      click(
-                        document
-                          .querySelector('.panelActions')!
-                          .querySelectorAll('button')[4]
-                      ).then(() => {
-                        if (iFrame.contentWindow) {
-                          iFrame.contentWindow.postMessage(
-                            {
-                              action: 'searchAction',
-                              purchase: true,
-                              count,
-                              sessionCount,
-                            },
-                            '*'
-                          )
-                        }
-                        click('.ut-navigation-button-control')
-                        setTimeout(() => {
-                          startSearch(searching, maxBuy, sellPrice)
-                        }, 3000)
-                      })
-                    })
-                }
-              )
+                  startSearch(searching, maxBuy, sellPrice)
+                })
+              })
+              click('.accordian').then(() => {
+                const buyNowEl = document
+                  .querySelectorAll('.panelActionRow')[2]
+                  .querySelector('input')!
+                const bidEl = document
+                  .querySelectorAll('.panelActionRow')[1]
+                  .querySelector('input')!
+                bidEl.value = sellPrice
+                buyNowEl.value = sellPrice
+                buyNowEl.dispatchEvent(changeEvent)
+                click(
+                  document
+                    .querySelector('.panelActions')!
+                    .querySelectorAll('button')[4]
+                ).then(() => {
+                  if (iFrame.contentWindow) {
+                    iFrame.contentWindow.postMessage(
+                      {
+                        action: 'searchAction',
+                        purchase: true,
+                        count,
+                        sessionCount,
+                      },
+                      '*'
+                    )
+                  }
+                  click('.ut-navigation-button-control')
+                  setTimeout(() => {
+                    startSearch(searching, maxBuy, sellPrice)
+                  }, 3000)
+                })
+              })
+            })
           })
         })
-        .catch((error) => {
-          searching = error
+        .catch(() => {
           if (searching) {
             startSearch(searching, maxBuy, sellPrice)
           }
         })
-        .finally(() => {
-          if (count == setCount) {
-            count = 0
-            if (iFrame.contentWindow) {
-              iFrame.contentWindow.postMessage(
-                {
-                  action: 'startBreak',
-                  count,
-                  setCount,
-                  pauseTime,
-                  searching,
-                  sessionCount,
-                },
-                '*'
-              )
-            }
-          }
-        })
-    }
-  )
+    })
+    .catch(() => {
+      count = 0
+      if (iFrame.contentWindow) {
+        iFrame.contentWindow.postMessage(
+          {
+            action: 'startBreak',
+            count,
+            setCount,
+            pauseTime,
+            searching,
+            sessionCount,
+          },
+          '*'
+        )
+      }
+    })
 }
 
 // Event for listening to messages from iFrame
@@ -259,14 +251,12 @@ window.addEventListener('message', async (event) => {
 
   // Start or stop searching
   if (data.action == 'startSearch') {
-    if(searching) {
+    if (searching) {
       const maxBuy = data.buyPrice
       const sellPrice = data.sellPrice
-  
+
       startSearch(searching, maxBuy, sellPrice)
     }
-
-    console.log(searching)
   }
 
   // When a card version is selected
